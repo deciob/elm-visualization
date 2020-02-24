@@ -3,6 +3,7 @@ module Interpolation exposing
     , float, int, step, rgb, rgbWithGamma, hsl, hslLong
     , map, map2, map3, map4, map5, piecewise, tuple
     , inParallel, list, ListCombiner(..), combineParallel
+    , fromLab, toLab, fromHcl, toHcl
     , samples
     )
 
@@ -28,6 +29,11 @@ so that you can build interpolators for your own custom datatypes.
 @docs inParallel, list, ListCombiner, combineParallel
 
 
+### Color Spaces
+
+@docs fromLab, toLab, fromHcl, toHcl
+
+
 ## Helpers
 
 @docs samples
@@ -35,7 +41,8 @@ so that you can build interpolators for your own custom datatypes.
 -}
 
 import Array
-import Color exposing (Color)
+import Color exposing (Color, toRgba)
+import Color.Lab as Lab
 import Dict exposing (Dict)
 
 
@@ -490,3 +497,90 @@ type ListCombiner
 combineParallel : ListCombiner
 combineParallel =
     CombineParallel
+
+
+
+-- COLOR EXTRAS
+
+
+{-| Extract the L\*a\*b\* and alpha components in the [CIELAB color space](https://en.wikipedia.org/wiki/CIELAB_color_space).
+-}
+toLab : Color -> { l : Float, a : Float, b : Float, alpha : Float }
+toLab color =
+    let
+        { red, green, blue, alpha } =
+            toRgba color
+
+        result =
+            Lab.to red green blue
+    in
+    { l = result.l, a = result.a, b = result.b, alpha = alpha }
+
+
+{-| Specify a color using the [CIELAB color space](https://en.wikipedia.org/wiki/CIELAB_color_space).
+The value of l is typically in the range [0, 100], while a and b are typically in [-160, +160].
+-}
+fromLab : { l : Float, a : Float, b : Float, alpha : Float } -> Color
+fromLab { l, a, b, alpha } =
+    let
+        result =
+            Lab.from l a b
+    in
+    Color.rgba result.red result.green result.blue alpha
+
+
+{-| Extract the hue, chroma, luminance and alpha components in the [CIE Lch(ab)](https://en.wikipedia.org/wiki/HCL_color_space) color space.
+-}
+toHcl : Color -> { hue : Float, chroma : Float, luminance : Float, alpha : Float }
+toHcl color =
+    let
+        { l, a, b, alpha } =
+            toLab color
+
+        nan =
+            0 / 0
+    in
+    if a == 0 && b == 0 then
+        { hue = nan
+        , chroma =
+            if 0 < l && l < 100 then
+                nan
+
+            else
+                0
+        , luminance = l
+        , alpha = alpha
+        }
+
+    else
+        let
+            h =
+                atan2 b a * 180 / pi
+        in
+        { hue =
+            if h < 0 then
+                h + 360
+
+            else
+                h
+        , chroma = sqrt (a ^ 2 + b ^ 2)
+        , luminance = l
+        , alpha = alpha
+        }
+
+
+{-| Constructs a color in the [CIE Lch(ab)](https://en.wikipedia.org/wiki/HCL_color_space) color space.
+This is especially useful for generating and manipulating colors, as this is a perceptually uniform color space.
+The value of l is typically in the range [0, 100], c is typically in [0, 230], and h is typically in [0, 360).
+-}
+fromHcl : { hue : Float, chroma : Float, luminance : Float, alpha : Float } -> Color
+fromHcl p =
+    if isNaN p.hue then
+        fromLab { l = p.luminance, a = 0, b = 0, alpha = p.alpha }
+
+    else
+        let
+            h =
+                p.hue * pi / 180
+        in
+        fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
