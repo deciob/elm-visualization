@@ -1,6 +1,6 @@
 module Interpolation exposing
     ( Interpolator
-    , float, int, step, rgb, rgbWithGamma, hsl, hslLong
+    , float, int, step, rgb, rgbWithGamma, hsl, hslLong, lab
     , map, map2, map3, map4, map5, piecewise, tuple
     , inParallel, list, ListCombiner(..), combineParallel
     , fromLab, toLab, fromHcl, toHcl
@@ -16,7 +16,7 @@ so that you can build interpolators for your own custom datatypes.
 
 ### Primitive interpolators
 
-@docs float, int, step, rgb, rgbWithGamma, hsl, hslLong
+@docs float, int, step, rgb, rgbWithGamma, hsl, hslLong, lab
 
 
 ### Composition
@@ -293,6 +293,20 @@ hslImpl hueInt from to =
     map4 Color.hsla (hueInt start.hue end.hue) (float start.saturation end.saturation) (float start.lightness end.lightness) (float start.alpha end.alpha)
 
 
+{-| Interpolates between two Color values using the [CIELAB color space](https://en.wikipedia.org/wiki/CIELAB_color_space) color space.
+-}
+lab : Color -> Color -> Interpolator Color
+lab from to =
+    let
+        start =
+            toLab from
+
+        end =
+            toLab to
+    in
+    map4 fromLabPositional (float start.l end.l) (float start.a end.a) (float start.b end.b) (float start.alpha end.alpha)
+
+
 hue : Float -> Float -> Interpolator Float
 hue from to =
     let
@@ -504,6 +518,9 @@ combineParallel =
 
 
 {-| Extract the L\*a\*b\* and alpha components in the [CIELAB color space](https://en.wikipedia.org/wiki/CIELAB_color_space).
+
+TODO: remove when done: d3.lab(l, a, b[, opacity])
+
 -}
 toLab : Color -> { l : Float, a : Float, b : Float, alpha : Float }
 toLab color =
@@ -529,7 +546,15 @@ fromLab { l, a, b, alpha } =
     Color.rgba result.red result.green result.blue alpha
 
 
+fromLabPositional : Float -> Float -> Float -> Float -> Color
+fromLabPositional l a b alpha =
+    fromLab { l = l, a = a, b = b, alpha = alpha }
+
+
 {-| Extract the hue, chroma, luminance and alpha components in the [CIE Lch(ab)](https://en.wikipedia.org/wiki/HCL_color_space) color space.
+
+TODO: remove when done: d3.hcl(h, c, l[, opacity])
+
 -}
 toHcl : Color -> { hue : Float, chroma : Float, luminance : Float, alpha : Float }
 toHcl color =

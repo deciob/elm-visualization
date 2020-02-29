@@ -123,6 +123,13 @@ suite =
                             , Color.rgb255 191 64 85
                             ]
             ]
+        , describe "lab" <|
+            [ only <|
+                test "interpolates in lab" <|
+                    \() ->
+                        interpolateColorTest Interpolation.lab
+                            { red = 134, green = 120, blue = 146 }
+            ]
         , describe "piecewise"
             [ fuzz3 float (list float) (floatRange 0 1) "never exceeds the range" <|
                 \head tail t ->
