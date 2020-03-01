@@ -2,7 +2,7 @@ module Color.Lab exposing (from, to)
 
 {-| Implements conversions to and from the CIELAB color space.
 
-For more information about this, see [[[[[[[[[[[[[[[[[[https://en.wikipedia.org/wiki/CIELAB\_color\_space#CIELAB](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB)](https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB).
+For more information about this, see <https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB>.
 
 For an explanation of the math in this module, see <https://observablehq.com/@mbostock/lab-and-rgb>.
 
@@ -53,7 +53,9 @@ to sr sg sb =
                 ( y, y )
 
             else
-                ( xyz2lab ((0.4360747 * lr + 0.3850649 * lg + 0.1430804 * lb) / xn), xyz2lab ((0.0139322 * lr + 0.0971045 * lg + 0.7141733 * lb) / zn) )
+                ( xyz2lab ((0.4360747 * lr + 0.3850649 * lg + 0.1430804 * lb) / xn)
+                , xyz2lab ((0.0139322 * lr + 0.0971045 * lg + 0.7141733 * lb) / zn)
+                )
     in
     { l = 116 * y - 16, a = 500 * (x - y), b = 200 * (y - z) }
 

@@ -1,6 +1,6 @@
 module Interpolation exposing
     ( Interpolator
-    , float, int, step, rgb, rgbWithGamma, hsl, hslLong, lab
+    , float, int, step, rgb, rgbWithGamma, hsl, hslLong, lab, hcl
     , map, map2, map3, map4, map5, piecewise, tuple
     , inParallel, list, ListCombiner(..), combineParallel
     , fromLab, toLab, fromHcl, toHcl
@@ -16,7 +16,7 @@ so that you can build interpolators for your own custom datatypes.
 
 ### Primitive interpolators
 
-@docs float, int, step, rgb, rgbWithGamma, hsl, hslLong, lab
+@docs float, int, step, rgb, rgbWithGamma, hsl, hslLong, lab, hcl
 
 
 ### Composition
@@ -305,6 +305,26 @@ lab from to =
             toLab to
     in
     map4 fromLabPositional (float start.l end.l) (float start.a end.a) (float start.b end.b) (float start.alpha end.alpha)
+
+
+{-| Interpolates between two Color values using the [CIE Lch(ab)](https://en.wikipedia.org/wiki/HCL_color_space) color space.
+-}
+hcl : Color -> Color -> Interpolator Color
+hcl from to =
+    let
+        start =
+            toHcl from
+                |> Debug.log "start -- this seems OK"
+
+        end =
+            toHcl to
+                |> Debug.log "end -- this seems OK"
+    in
+    map4 fromHclPositional
+        (float start.hue end.hue)
+        (float start.chroma end.chroma)
+        (float start.luminance end.luminance)
+        (float start.alpha end.alpha)
 
 
 hue : Float -> Float -> Interpolator Float
@@ -607,5 +627,13 @@ fromHcl p =
         let
             h =
                 p.hue * pi / 180
+
+            _ =
+                Debug.log "ssssssssss" { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
         in
         fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
+
+
+fromHclPositional : Float -> Float -> Float -> Float -> Color
+fromHclPositional h c l alpha =
+    fromHcl { hue = h, chroma = c, luminance = l, alpha = alpha }

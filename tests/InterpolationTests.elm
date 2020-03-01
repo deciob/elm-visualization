@@ -124,11 +124,17 @@ suite =
                             ]
             ]
         , describe "lab" <|
+            [ test "interpolates in lab" <|
+                \() ->
+                    interpolateColorTest Interpolation.lab
+                        { red = 134, green = 120, blue = 146 }
+            ]
+        , describe "hcl" <|
             [ only <|
-                test "interpolates in lab" <|
+                test "interpolates in hcl" <|
                     \() ->
-                        interpolateColorTest Interpolation.lab
-                            { red = 134, green = 120, blue = 146 }
+                        interpolateColorTest Interpolation.hcl
+                            { red = 106, green = 121, blue = 206 }
             ]
         , describe "piecewise"
             [ fuzz3 float (list float) (floatRange 0 1) "never exceeds the range" <|
