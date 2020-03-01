@@ -31,7 +31,7 @@ body, html {
 .palette {
     display: flex;
     width: 100%;
-    margin: 10px;
+    margin: 20px;
 }
 
 .palette div {
@@ -45,7 +45,7 @@ seedValues : List Float
 seedValues =
     let
         count =
-            40
+            100
 
         s =
             Scale.linear ( 0, 1 ) ( 0, toFloat count )
@@ -73,7 +73,7 @@ palette2 : Html msg
 palette2 =
     div [ class "palette" ]
         (seedValues
-            |> List.map (lab (rgb255 170 255 255) (rgb255 0 0 127))
+            |> List.map (lab (rgb255 85 170 255) (rgb255 0 170 127))
             |> List.map
                 (\color ->
                     Html.div [ style "background-color" (Color.toCssString color) ] []
@@ -93,6 +93,18 @@ palette3 =
         )
 
 
+palette4 : Html msg
+palette4 =
+    div [ class "palette" ]
+        (seedValues
+            |> List.map (lab (rgb255 0 85 255) (rgb255 170 0 0))
+            |> List.map
+                (\color ->
+                    Html.div [ style "background-color" (Color.toCssString color) ] []
+                )
+        )
+
+
 main : Html msg
 main =
     Html.div []
@@ -102,5 +114,6 @@ main =
             [ palette1
             , palette2
             , palette3
+            , palette4
             ]
         ]
