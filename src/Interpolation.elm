@@ -321,7 +321,7 @@ hcl from to =
                 |> Debug.log "end -- this seems OK"
     in
     map4 fromHclPositional
-        (float start.hue end.hue)
+        (hue (start.hue / 360) (end.hue / 360))
         (float start.chroma end.chroma)
         (float start.luminance end.luminance)
         (float start.alpha end.alpha)
@@ -331,14 +331,16 @@ hue : Float -> Float -> Interpolator Float
 hue from to =
     let
         d =
-            to - from
+            to
+                - from
+                |> Debug.log "d"
     in
     float from
         (if d > 0.5 || d < -0.5 then
-            from + (d - 1 * toFloat (round d))
+            from + (d - 1 * toFloat (round d)) |> Debug.log "to-1"
 
          else
-            to
+            to |> Debug.log "to"
         )
 
 
@@ -626,10 +628,19 @@ fromHcl p =
     else
         let
             h =
-                p.hue * pi / 180
+                p.hue
+                    * pi
+                    / 180
+                    |> Debug.log "h"
+
+            _ =
+                Debug.log "p" p
 
             _ =
                 Debug.log "ssssssssss" { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
+
+            _ =
+                Debug.log "fromLab ssssssss" (fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha })
         in
         fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
 

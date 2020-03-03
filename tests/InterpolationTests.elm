@@ -134,6 +134,10 @@ suite =
                 test "interpolates in hcl" <|
                     \() ->
                         interpolateColorTest Interpolation.hcl
+                            --"rgb(-36, 134, 206)"
+                            --
+                            -- d3.rgb(d3.lab( 52.44734587812755, -11.941042039172457, -46.978769439815636 ))
+                            -- {r: -36.39457954492015, g: 133.86466755681585, b: 205.90823186475575, opacity: 1}
                             { red = 106, green = 121, blue = 206 }
             ]
         , describe "piecewise"
