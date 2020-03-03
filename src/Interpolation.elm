@@ -321,10 +321,34 @@ hcl from to =
                 |> Debug.log "end -- this seems OK"
     in
     map4 fromHclPositional
-        (hue (start.hue / 360) (end.hue / 360))
+        (hueHcl (start.hue / 1) (end.hue / 1))
         (float start.chroma end.chroma)
         (float start.luminance end.luminance)
         (float start.alpha end.alpha)
+
+
+
+--export function hue(a, b) {
+--  var d = b - a;
+--  return d ? linear(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : constant(isNaN(a) ? b : a);
+--}
+
+
+hueHcl : Float -> Float -> Interpolator Float
+hueHcl from to =
+    let
+        d =
+            to
+                - from
+                |> Debug.log "d"
+    in
+    float from
+        (if d > 180 || d < -180 then
+            from + (d - 360 * toFloat (round (d / 360)))
+
+         else
+            to
+        )
 
 
 hue : Float -> Float -> Interpolator Float
@@ -337,10 +361,10 @@ hue from to =
     in
     float from
         (if d > 0.5 || d < -0.5 then
-            from + (d - 1 * toFloat (round d)) |> Debug.log "to-1"
+            from + (d - 1 * toFloat (round d))
 
          else
-            to |> Debug.log "to"
+            to
         )
 
 
@@ -633,14 +657,12 @@ fromHcl p =
                     / 180
                     |> Debug.log "h"
 
-            _ =
-                Debug.log "p" p
-
-            _ =
-                Debug.log "ssssssssss" { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
-
-            _ =
-                Debug.log "fromLab ssssssss" (fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha })
+            --_ =
+            --    Debug.log "p" p
+            --_ =
+            --    Debug.log "ssssssssss" { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
+            --_ =
+            --    Debug.log "fromLab ssssssss" (fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha })
         in
         fromLab { l = p.luminance, a = cos h * p.chroma, b = sin h * p.chroma, alpha = p.alpha }
 
